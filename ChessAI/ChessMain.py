@@ -29,25 +29,36 @@ The main driver for our code. This will handle user input and updating the graph
 
 
 def main():
-    #p.init()
-    background_colour = (255, 255, 255)
+    p.init()
     screen = p.display.set_mode((WIDTH, HEIGHT))
     clock = p.time.Clock()
-    screen.fill(background_colour)
+    screen.fill(p.Color("white"))
     gs = ChessEngine.GameState()
     print(gs.board)
     loadImages()
     running = True
-    sqSelected = () #no square selected, keep track of the last click of the user (tuple: (row,col))
-    playerClicks = [] #keep track of player clicks (two tuple: [(6,4),(4,4)])
+    sqSelected = ()  # no square selected, keep track of the last click of the user (tuple: (row,col))
+    playerClicks = []  # keep track of player clicks (two tuple: [(6,4),(4,4)])
     while running:
         for e in p.event.get():
             if e.type == p.QUIT:
                 running = False
             elif e.type == p.MOUSEBUTTONDOWN:
-                location = p.mouse.get_pos() #get (x.y) location of mouse
-                col = location[0]//SQ_SIZE
-                row = location[1]//SQ_SIZE
+                location = p.mouse.get_pos()  # get (x.y) location of mouse
+                col = location[0] // SQ_SIZE
+                row = location[1] // SQ_SIZE
+                if sqSelected == (row, col):  # user clicked on the same square twice
+                    sqSelected = ()
+                    playerClicks = []
+                else:
+                    sqSelected = (row, col)
+                    playerClicks.append(sqSelected)
+                if len(playerClicks) == 2:
+                    move = ChessEngine.Move(playerClicks[0], playerClicks[1], gs.board)
+                    print(move.getChessNotation())
+                    gs.makeMove(move)
+                    sqSelected=()
+                    playerClicks =[]
         drawGameState(screen, gs)
         clock.tick(MAX_FPS)
         p.display.flip()
@@ -80,9 +91,8 @@ def drawPieces(screen, board):
     for r in range(DIMENSION):
         for c in range(DIMENSION):
             piece = board[r][c]
-            if piece !=  "--":
-                screen.blit(IMAGES[piece], p.Rect(c*SQ_SIZE, r*SQ_SIZE, SQ_SIZE,SQ_SIZE))
-
+            if piece != "--":
+                screen.blit(IMAGES[piece], p.Rect(c * SQ_SIZE, r * SQ_SIZE, SQ_SIZE, SQ_SIZE))
 
 
 if __name__ == "__main__":

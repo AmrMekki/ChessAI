@@ -28,8 +28,9 @@ class GameState:
         self.moveLog = []
         self.whiteKingLocation = (7, 4)
         self.blackKingLocation = (0, 4)
-        self.checkMate = False
-        self.staleMate = False
+        self.inCheck = False
+        self.pins = []
+        self.checks = []
 
     """
     Takes a Move as parameter and executes it (this will not work for castling, pawn promotion, and en-passant.
@@ -67,27 +68,46 @@ class GameState:
     """
 
     def getValidMoves(self):
-        # 1.) generate all possible moves
-        moves = self.getAllPossibleMoves()
-        # 2.) for each move, make the move
-        for i in range(len(moves) - 1, -1, -1):  # when removing from a list, go backwards through that list
-            self.makeMove(moves[i])
-            # 3.) generate all opponent's moves
-            # 4.) for each of your opponent's moves, see if they attack your king
-            self.whiteToMove = not self.whiteToMove
-            if self.inCheck():
-                moves.remove(moves[i])  # 5.) if they do attack your king, not a valid move
-            self.whiteToMove = not self.whiteToMove
-            self.undoMove()
-        if len(moves) == 0: #either checkmate or stalemate
-            if self.inCheck():
-                self.checkMate = True
-            else:
-                self.staleMate = True
-        else: #so that if the players undo moves
-            self.checkMate = False
-            self.staleMate = False
-        return moves
+        moves = []
+        self.inCheck, self.pins,self.checks = self.checkForPinsAndChecks()
+        if self.whiteToMove:
+            kingRow = self.whiteKingLocation[0]
+            kingCol = self.whiteKingLocation[1]
+        else:
+            kingRow = self.blackKingLocation[0]
+            kingCol = self.blackKingLocation[1]
+        if self.inCheck:
+            if len(self.checks) == 1: #only 1 check, block check or move king
+                moves = self.getAllPossibleMoves()
+                #to block a check you must move a piece into one of the squares between the enemy piece and king
+                check = self.checks[0]
+                checkRow = check[0]
+                checkCol = check[1]
+                pieceChecking = self.board[checkRow][checkCol] #enemy piece causing the check
+                validSquares = [] #squares that pieces can move to
+                #if knight, must capture knight or move king, other pieces can be blocked
+                if pieceChecking[1] == 'N':
+                    validSquares = [(checkRow, checkCol)]
+                else:
+                    pass
+
+    """
+    Returns if the player is in check, a list of pins, and a list of checks
+    """
+    def checkForPinsAndChecks(self):
+        pins = [] #squares where the allied pinned piece is and direction pinned from
+        checks = [] #squares where enemy is applying a check
+        inCheck = False
+        if self.whiteToMove:
+            enemyColor = "b"
+            allyColor = "w"
+            startRow = self.whiteKingLocation[0]
+            startCol = self.whiteKingLocation[1]
+        else:
+            enemyColor = "w"
+            allyColor = "b"
+            startRow = self.blackKingLocation[0]
+            startCol = self.blackKingLocation[1]
 
     """
     Determine if current player is in check
@@ -176,27 +196,6 @@ class GameState:
                         break
                 else:  # off board
                     break
-        # if self.whiteToMove:
-        #     i = 1
-        #     while i < 7 and c + i <= 7:  # to move to the right
-        #         if self.board[r][c + i] == "--":
-        #             moves.append(Move((r, c), (r, c + i), self.board))
-        #         elif self.board[r][c + i][0] == 'b':
-        #             moves.append(Move((r, c), (r, c + i), self.board))
-        #             break
-        #         elif self.board[r][c + i][0] == 'w':
-        #             break
-        #         i = i + 1
-        #
-        #     while i < 7 and c - i >=0:  # to move to the left
-        #         if self.board[r][c - i] == "--":
-        #             moves.append(Move((r, c), (r, c - i), self.board))
-        #         elif self.board[r][c - i][0] == 'b':
-        #             moves.append(Move((r, c), (r, c - i), self.board))
-        #             break
-        #         elif self.board[r][c - i][0] == 'w':
-        #             break
-        #         i = i + 1
 
     """
     Get all the knight moves for the knight located at row, col and add these moves to list

@@ -68,7 +68,7 @@ def main():
             # key handler
             elif e.type == p.KEYDOWN:
                 if e.key == p.K_z:
-                    gs.undoMove(move)
+                    gs.undoMove()
                     moveMade = True
         if moveMade:
             validMoves = gs.getValidMoves()

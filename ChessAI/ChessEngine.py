@@ -180,7 +180,6 @@ class GameState:
             backRow = 7
             enemyColor = 'w'
         pawnPromotion = False
-
         if self.board[r + moveAmount][c] == "--":  # 1 square move
             if not piecePinned or pinDirection == (moveAmount, 0):
                 if r + moveAmount == backRow:  # if piece gets to back rank then it is a pawn promotoion
@@ -188,7 +187,7 @@ class GameState:
                 moves.append(Move((r, c), (r + moveAmount, c), self.board, pawnPromotion=pawnPromotion))
                 if r == startRow and self.board[r + 2 * moveAmount][c] == "--":  # 2 square moves
                     moves.append(Move((r, c), (r + 2 * moveAmount, c), self.board))
-        if c - 1 > 0:  # capture to left
+        if c - 1 >= 0:  # capture to left
             if not piecePinned or pinDirection == (moveAmount, -1):
                 if self.board[r + moveAmount][c - 1][0] == enemyColor:
                     if r + moveAmount == backRow:  # if piece gets to back rank then it is a pawn promotion

@@ -56,7 +56,6 @@ class GameState:
 
         # if en passant move, must update the board to capture the pawn
         if move.enPassant:
-            print("here")
             self.board[move.startRow][move.endCol] = "--"
         # if pawn promotion change piece
         if move.pawnPromotion:
@@ -119,7 +118,14 @@ class GameState:
                                        kingCol + check[3] * i)  # check[2] and check[3] are the check directions
                         validSquares.append(validSquare)
                         # once you get to piece end checks
-                        if validSquare[0] == checkRow and validSquares[1] == checkCol:
+                        # print(check[2])
+                        # print(check[3])
+                        # print(i)
+                        # print(validSquares)
+                        # print(validSquare)
+                        # print(checkRow)
+                        # print(checkCol)
+                        if validSquare[0] == checkRow and validSquare[1] == checkCol:
                             break
                 # get rid of any moves that don't block check or move king
                 # go through backwards when you are removing from a list as iterating
@@ -189,7 +195,6 @@ class GameState:
                         pawnPromotion = True
                     moves.append(Move((r, c), (r + moveAmount, c - 1), self.board, pawnPromotion=pawnPromotion))
                 if (r + moveAmount, c - 1) == self.enPassantPossible:
-                    print("here pawnmove")
                     moves.append(Move((r, c), (r + moveAmount, c - 1), self.board, enPassant=True))
         if c + 1 <= 7:  # capture to right
             if not piecePinned or pinDirection == (moveAmount, 1):
@@ -198,7 +203,6 @@ class GameState:
                         pawnPromotion = True
                     moves.append(Move((r, c), (r + moveAmount, c + 1), self.board, pawnPromotion=pawnPromotion))
                 if (r + moveAmount, c + 1) == self.enPassantPossible:
-                    print("here pawnmove")
                     moves.append(Move((r, c), (r + moveAmount, c + 1), self.board, enPassant=True))
 
     """
@@ -410,7 +414,6 @@ class Move:
         self.enPassant = enPassant
         self.pawnPromotion = pawnPromotion
         if enPassant:
-            print("here move func enpassant")
             self.pieceCaptured = 'bp' if self.pieceMoved == 'wp' else 'wp'  # enpassant captures opposite colored pawn
         self.moveID = self.startRow * 1000 + self.startCol * 100 + self.endRow * 10 + self.endCol
 

@@ -83,7 +83,7 @@ class GameState:
                 self.board[move.startRow][move.endCol] = move.pieceCaptured
                 self.enpassantPossible = (move.endRow, move.endCol)
             #undo a 2 square pawn advance
-            if move.pieceMoved[1] == 'p' and abd(move.startRow- move.endRow) == 2:
+            if move.pieceMoved[1] == 'p' and abs(move.startRow- move.endRow) == 2:
                 self.enpassantPossible = ()
 
     """

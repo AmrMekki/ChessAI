@@ -60,7 +60,7 @@ def main():
                     for i in range (len(validMoves)):
                         if move == validMoves[i]:
                             print(move.getChessNotation())
-                            gs.makeMove(move)
+                            gs.makeMove(validMoves[i])
                             moveMade = True
                             sqSelected = ()
                             playerClicks = []

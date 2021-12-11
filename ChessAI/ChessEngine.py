@@ -28,10 +28,16 @@ class GameState:
         self.moveLog = []
         self.whiteKingLocation = (7, 4)
         self.blackKingLocation = (0, 4)
+        self.checkMate = False
+        self.staleMate = False
         self.inCheck = False
         self.pins = []
         self.checks = []
         self.enPassantPossible = ()  # coordinates for the square where an en passant capture is possible
+        self.currentCastlingRights = CastleRights(True, True, True, True)
+        self.castleRightsLog = [
+            CastleRights(self.currentCastlingRights.wks, self.currentCastlingRights.bks, self.currentCastlingRights.wqs,
+                         self.currentCastlingRights.bqs)]
 
     """
     Takes a Move as parameter and executes it (this will not work for castling, pawn promotion, and en-passant.
@@ -62,6 +68,12 @@ class GameState:
             promotedPiece = input("Promote to Q, R, B, or N:")  # we can make this part of the ui later
             self.board[move.endRow][move.endCol] = move.pieceMoved[0] + promotedPiece
 
+        # update castling rights - whenever it is a rook or a king move
+        self.updateCastleRights(move)
+        self.castleRightsLog.append(
+            CastleRights(self.currentCastlingRights.wks, self.currentCastlingRights.bks, self.currentCastlingRights.wqs,
+                         self.currentCastlingRights.bqs))
+
     """
     Undo last move
     """
@@ -86,6 +98,34 @@ class GameState:
             # undo a 2 square pawn advance
             if move.pieceMoved[1] == 'p' and abs(move.startRow - move.endRow) == 2:
                 self.enPassantPossible = ()
+
+            # undo castling rights
+            self.castleRightsLog.pop() #get rid of new castle rights
+            self.currentCastlingRights = self.castleRightsLog[-1] #set current castle rights to the last one in list
+
+    """
+    update the castle rights given the move
+    """
+
+    def updateCastleRights(self, move):
+        if move.pieceMoved == "wK":
+            self.currentCastlingRights.wks = False
+            self.currentCastlingRights.wqs = False
+        elif move.pieceMoved == "bK":
+            self.currentCastlingRights.bks = False
+            self.currentCastlingRights.bqs = False
+        elif move.pieceMoved == "wR":
+            if move.startRow == 7:
+                if move.startCol == 0:  # left rook
+                    self.currentCastlingRights.wqs = False
+                elif move.startCol == 7:  # right rook
+                    self.currentCastlingRights.wks = False
+        elif move.pieceMoved == "bR":
+            if move.startRow == 0:
+                if move.startCol == 0:  # left rook
+                    self.currentCastlingRights.bqs = False
+                elif move.startCol == 7:  # right rook
+                    self.currentCastlingRights.bks = False
 
     """
     All moves considering checks
@@ -117,14 +157,6 @@ class GameState:
                         validSquare = (kingRow + check[2] * i,
                                        kingCol + check[3] * i)  # check[2] and check[3] are the check directions
                         validSquares.append(validSquare)
-                        # once you get to piece end checks
-                        # print(check[2])
-                        # print(check[3])
-                        # print(i)
-                        # print(validSquares)
-                        # print(validSquare)
-                        # print(checkRow)
-                        # print(checkCol)
                         if validSquare[0] == checkRow and validSquare[1] == checkCol:
                             break
                 # get rid of any moves that don't block check or move king
@@ -182,7 +214,7 @@ class GameState:
         pawnPromotion = False
         if self.board[r + moveAmount][c] == "--":  # 1 square move
             if not piecePinned or pinDirection == (moveAmount, 0):
-                if r + moveAmount == backRow:  # if piece gets to back rank then it is a pawn promotoion
+                if r + moveAmount == backRow:  # if piece gets to back rank then it is a pawn promotion
                     pawnPromotion = True
                 moves.append(Move((r, c), (r + moveAmount, c), self.board, pawnPromotion=pawnPromotion))
                 if r == startRow and self.board[r + 2 * moveAmount][c] == "--":  # 2 square moves
@@ -391,6 +423,14 @@ class GameState:
                         inCheck = True
                         checks.append((endRow, endCol, m[0], m[1]))
         return inCheck, pins, checks
+
+
+class CastleRights:
+    def __init__(self, wks, bks, wqs, bqs):
+        self.wks = wks
+        self.bks = bks
+        self.wqs = wqs
+        self.bqs = bqs
 
 
 class Move:

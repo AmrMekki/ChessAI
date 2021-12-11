@@ -34,10 +34,10 @@ def main():
     clock = p.time.Clock()
     screen.fill(p.Color("white"))
     gs = ChessEngine.GameState()
-    validMoves = gs.getValidMoves()
     moveMade = False #flag variable for when a move is made
     loadImages()
     running = True
+    validMoves = gs.getValidMoves()
     sqSelected = ()  # no square selected, keep track of the last click of the user (tuple: (row,col))
     playerClicks = []  # keep track of player clicks (two tuple: [(6,4),(4,4)])
     while running:

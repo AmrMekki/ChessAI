@@ -342,13 +342,8 @@ class GameState:
                             if possiblePin == ():  # no piece blocking, so check
                                 inCheck = True
                                 checks.append((endRow, endCol, d[0], d[1]))
-                                break
                             else:  # piece blocking so pin
                                 pins.append(possiblePin)
-                        else:  # enemy piece not applying check:
-                            break
-                    else:  # off board
-                        break
             # check for knight checks
             knightMoves = ((-2, -1), (-2, 1), (-1, -2), (-1, 2), (1, -2), (1, 2), (2, -1), (2, 1))
             for m in knightMoves:
@@ -359,7 +354,7 @@ class GameState:
                     if endPiece[0] == enemyColor and endPiece[1] == "N":  # enemy knight attacking king
                         inCheck = True
                         checks.append((endRow, endCol, m[0], m[1]))
-            return inCheck, pins, checks
+        return inCheck, pins, checks
 
 
 class Move:
@@ -389,6 +384,9 @@ class Move:
         if isinstance(other, Move):
             return self.moveID == other.moveID
         return False
+
+    def __str__(self):
+        return self.moveID
 
     def getChessNotation(self):
         # add to make this like real chess notation

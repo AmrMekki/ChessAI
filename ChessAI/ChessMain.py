@@ -76,6 +76,7 @@ def main():
                     gs.undoMove()
                     moveMade = True
                     animate = False
+                    gameOver = False
                 if e.key == p.K_r: #reset the board when 'r' is pressed
                     gs = ChessEngine.GameState()
                     validMoves = gs.getValidMoves()
@@ -91,6 +92,16 @@ def main():
             moveMade = False
             animate = False
         drawGameState(screen, gs, validMoves, sqSelected)
+
+        if gs.checkMate:
+            gameOver = True
+            if gs.whiteToMove:
+                drawText(screen, 'Black wins by checkmate')
+            else:
+                drawText(screen, 'White wins by checkmate')
+        elif gs.staleMate:
+            gameOver = True
+            drawText(screen, 'Stalemate')
         clock.tick(MAX_FPS)
         p.display.flip()
 
@@ -177,6 +188,13 @@ def animateMove(move, screen, board, clock):
         p.display.flip()
         clock.tick(60)
 
+def drawText(screen, text):
+    font = p.font.SysFont("Helvitca", 32, True, False)
+    textObject = font.render(text, 0 , p.Color('Gray'))
+    textLocation = p.Rect(0,0,WIDTH,HEIGHT).move(WIDTH/2 - textObject.get_width()/2, HEIGHT/2 - textObject.get_height()/2)
+    screen.blit(textObject, textLocation)
+    textObject = font.render(text, 0 , p.Color('Black'))
+    screen.blit(textObject, textLocation.move(2,2))
 
 if __name__ == "__main__":
     main()

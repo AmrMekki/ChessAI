@@ -95,6 +95,8 @@ class GameState:
     def undoMove(self):
         if len(self.moveLog) != 0:
             move = self.moveLog.pop()
+            self.checkMate = False
+            self.staleMate = False
             self.board[move.startRow][move.startCol] = move.pieceMoved  # put piece on starting square
             self.board[move.endRow][move.endCol] = move.pieceCaptured  # put back captured piece
             self.whiteToMove = not self.whiteToMove  # switch turns back

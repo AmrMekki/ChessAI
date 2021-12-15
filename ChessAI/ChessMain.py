@@ -34,23 +34,22 @@ def main():
     screen.fill(p.Color("white"))
     gs = ChessEngine.GameState()
     moveMade = False  # flag variable for when a move is made
-    animate = False #flag variable for when we should animate a move
+    animate = False  # flag variable for when we should animate a move
     loadImages()
     running = True
     validMoves = gs.getValidMoves()
     sqSelected = ()  # no square selected, keep track of the last click of the user (tuple: (row,col))
     playerClicks = []  # keep track of player clicks (two tuple: [(6,4),(4,4)])
     gameOver = False
-    playerOne = True #If a Human is playing white, then this will be True. If an AI is playing, then it will be False
-    playerTwo = False #Same as above but for black
-
+    playerOne = True  # If a Human is playing white, then this will be True. If an AI is playing, then it will be False
+    playerTwo = False  # Same as above but for black
 
     while running:
         humanTurn = (gs.whiteToMove and playerOne) or (not gs.whiteToMove and playerTwo)
         for e in p.event.get():
             if e.type == p.QUIT:
                 running = False
-            #mouse handler
+            # mouse handler
             elif e.type == p.MOUSEBUTTONDOWN:
                 if not gameOver and humanTurn:
                     location = p.mouse.get_pos()  # get (x.y) location of mouse
@@ -81,7 +80,7 @@ def main():
                     moveMade = True
                     animate = False
                     gameOver = False
-                if e.key == p.K_r: #reset the board when 'r' is pressed
+                if e.key == p.K_r:  # reset the board when 'r' is pressed
                     gs = ChessEngine.GameState()
                     validMoves = gs.getValidMoves()
                     sqSelected = ()
@@ -89,15 +88,15 @@ def main():
                     moveMade = False
                     animate = False
 
-        #AI move finder
+        # AI move finder
         if not gameOver and not humanTurn:
-            AIMove = SmartMoveFinder.findBestMove(gs,validMoves)
-            if AIMove == None: #shouldn't access
+            AIMove = SmartMoveFinder.findBestMove(gs, validMoves)
+            if AIMove == None:  # shouldn't access
                 AIMove = SmartMoveFinder.findRandomMove(validMoves)
             gs.makeMove(AIMove)
             moveMade = True
             animate = True
-        
+
         if moveMade:
             if animate:
                 animateMove(gs.moveLog[-1], screen, gs.board, clock)
@@ -201,13 +200,16 @@ def animateMove(move, screen, board, clock):
         p.display.flip()
         clock.tick(60)
 
+
 def drawText(screen, text):
     font = p.font.SysFont("Helvitca", 32, True, False)
-    textObject = font.render(text, 0 , p.Color('Gray'))
-    textLocation = p.Rect(0,0,WIDTH,HEIGHT).move(WIDTH/2 - textObject.get_width()/2, HEIGHT/2 - textObject.get_height()/2)
+    textObject = font.render(text, 0, p.Color('Gray'))
+    textLocation = p.Rect(0, 0, WIDTH, HEIGHT).move(WIDTH / 2 - textObject.get_width() / 2,
+                                                    HEIGHT / 2 - textObject.get_height() / 2)
     screen.blit(textObject, textLocation)
-    textObject = font.render(text, 0 , p.Color('Black'))
-    screen.blit(textObject, textLocation.move(2,2))
+    textObject = font.render(text, 0, p.Color('Black'))
+    screen.blit(textObject, textLocation.move(2, 2))
+
 
 if __name__ == "__main__":
     main()

@@ -1,5 +1,4 @@
 import random
-from typing import ValuesView
 
 pieceScore = {"K": 0, "Q": 9, "R": 5, "B": 3, "N": 3, "p": 1}
 CHECKMATE = 1000
@@ -13,7 +12,7 @@ def findRandomMove(validMoves):
 def findGreedyMove(gs, validMoves):
     turnMultiplier = 1 if gs.whiteToMove else -1
 
-    maxScore = -CHECKMATE  # for black checkmate is worst possible score
+    maxScore = -CHECKMATE  # for black checkmate is the worst possible score
     bestMove = None
 
     # Greedy way
@@ -32,28 +31,31 @@ def findGreedyMove(gs, validMoves):
     return bestMove
 
 
-##DEBUG LATER
+# DEBUG LATER
 def findBestMove(gs, validMoves):
     turnMultiplier = 1 if gs.whiteToMove else -1
-
     opponentMinMaxScore = CHECKMATE
     bestPlayerMove = None
+    # random.shuffle(validMoves)
 
     for playerMove in validMoves:
         gs.makeMove(playerMove)
         opponentMoves = gs.getValidMoves()
+        opponentMaxScore = -CHECKMATE
         for opponentMove in opponentMoves:
             gs.makeMove(opponentMove)
             if gs.checkMate:
-                score = -CHECKMATE
+                score = - turnMultiplier * CHECKMATE
             elif gs.staleMate:
                 score = 0
             else:
                 score = -turnMultiplier * scoreMaterial(gs.board)
             if score > opponentMinMaxScore:
                 opponentMinMaxScore = score
-                bestPlayerMove = playerMove
             gs.undoMove()
+        if opponentMaxScore < opponentMinMaxScore:
+            opponentMinMaxScore = opponentMaxScore
+            bestPlayerMove = playerMove
         gs.undoMove()
     return bestPlayerMove
 
